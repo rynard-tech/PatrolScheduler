@@ -392,6 +392,7 @@ Create ShiftType including:
 - CUSTOM
 
 Each shift type:
+- name
 - start_time
 - end_time
 - paid_hours
@@ -451,6 +452,7 @@ Every employee/date should resolve to one primary DailyAssignment:
 - primary_role
 - special_role
 - family_supervisor_id context
+- manager_on_duty context if needed
 - locked
 - manual_override
 - override_reason
@@ -466,6 +468,8 @@ While `rookie_status = ROOKIE`:
 - rookie is exempt from normal station-diversity max-2 rule
 
 When employee graduates, normal diversity rules begin automatically.
+
+Track the graduation event and `graduation_date`; reaching that date may transition the existing employee record to graduated rules without recreating it.
 
 Allow manual override if management intentionally places a rookie elsewhere.
 
@@ -520,6 +524,7 @@ Track EmployeeSeasonStats:
 - southside_total
 - first_tracks_days
 - night_ski_days
+- supervisor_days if useful
 - last_station
 - recent_station_sequence
 
@@ -585,7 +590,9 @@ Supervisors follow the same general station-diversity rule as graduated patrolle
 
 Managers are exempt because managers always remain Dercum.
 
-## 26. Manager-supervisor exposure
+## 26. Manager work patterns and supervisor exposure
+Managers use a configurable ManagerWorkPattern rather than the normal 4-day pattern. Initialize current operations for two managers at 5 days per week, always at Dercum, with their schedules covering both sides of the week.
+
 Because managers always work Dercum, supervisors should rotate through Dercum so managers see a diverse supervisor group.
 
 Track ManagerSupervisorExposure:
@@ -598,6 +605,8 @@ Track ManagerSupervisorExposure:
 If Supervisor S has much more exposure to Manager A than Manager B, and S must work Dercum on a day where either pairing is possible, prefer Manager B.
 
 This is a soft objective below operational requirements.
+
+Manager-supervisor exposure, supervisor-family exposure, and graduated-employee station diversity are related but independent objectives. Relationship optimization must never override safety, staffing, or qualification constraints.
 
 ## 27. Daily supervisor distribution
 Daily requirements must support at least:
@@ -625,6 +634,8 @@ Statuses:
 - OVERRIDE_APPROVED
 
 Once approved, PTO is respected as unavailable time.
+
+Requests beyond the configured daily limit must be flagged `DIRECTOR / MANAGEMENT APPROVAL REQUIRED`. An explicit override approval makes that PTO unavailable time and requires staffing to be rebuilt around it.
 
 Do not cancel PTO to make the solver work.
 
@@ -704,6 +715,8 @@ Priority:
 4. qualification/supervisor distribution
 5. optional secondary pattern quality
 
+Do not assume contiguous schedules are always preferable when an employee explicitly ranks a split schedule.
+
 ## 32. Wave solver
 Inputs:
 - wave capacity / target people per day
@@ -746,25 +759,26 @@ Output for every working employee:
 - role
 
 Conceptual priority/order:
-1. determine active/scheduled employees
-2. apply PTO/unavailability
-3. add PT coverage
-4. fill highly constrained special roles
-5. First Tracks
-6. Night Ski
-7. required supervisors
-8. route leaders/prospective leaders/team leads
-9. Bergman minimum
-10. Outback minimum
-11. North Peak minimum
-12. remaining staff to Dercum
-13. validate Dercum-specific roles
-14. optimize station diversity
-15. optimize Southside fairness
-16. optimize manager-supervisor exposure
-17. optimize supervisor-family exposure
-18. other crew diversity
-19. final validation
+1. determine who is active for the date
+2. determine which FT employees are scheduled to work that weekday
+3. apply PTO/unavailability
+4. add selected PT coverage
+5. fill highly constrained special roles
+6. fill First Tracks when active
+7. fill Night Ski when active
+8. fill required supervisors
+9. fill route leaders, prospective route leaders, and team leads
+10. satisfy Bergman minimum staffing
+11. satisfy Outback minimum staffing
+12. satisfy North Peak minimum staffing
+13. assign remaining employees to Dercum
+14. validate Dercum-specific roles
+15. optimize station diversity
+16. optimize Southside fairness
+17. optimize manager-supervisor exposure
+18. optimize supervisor-family exposure
+19. optimize secondary crew-diversity objectives
+20. validate the complete result
 
 CP-SAT may solve globally. This list expresses priority, not mandatory procedural implementation.
 
