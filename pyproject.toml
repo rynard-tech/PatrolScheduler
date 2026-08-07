@@ -1,0 +1,27 @@
+[build-system]
+requires = ["hatchling==1.27.0"]
+build-backend = "hatchling.build"
+
+[project]
+name = "patrol-scheduler"
+version = "0.1.0"
+requires-python = ">=3.12"
+dependencies = [
+  "fastapi==0.116.1", "uvicorn==0.35.0", "sqlalchemy==2.0.43",
+  "pydantic==2.11.7", "alembic==1.16.5", "ortools==9.14.6206",
+  "openpyxl==3.1.5",
+]
+
+[project.optional-dependencies]
+test = ["pytest==8.4.1", "httpx==0.28.1"]
+
+[project.scripts]
+patrol-schedule = "backend.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["backend"]
+
+[tool.pytest.ini_options]
+testpaths = ["backend/tests"]
+addopts = "-q"
+pythonpath = ["."]
