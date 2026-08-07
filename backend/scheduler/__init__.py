@@ -1,0 +1,1 @@
+"""Constraint-based scheduling package."""
