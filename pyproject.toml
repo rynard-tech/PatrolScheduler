@@ -1,0 +1,24 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "patrol-scheduler"
+version = "0.1.0"
+description = "Constraint-based ski patrol deployment scheduler"
+requires-python = ">=3.11"
+dependencies = ["ortools>=9.10,<10"]
+
+[project.optional-dependencies]
+dev = ["pytest>=8"]
+excel = ["openpyxl>=3.1"]
+
+[project.scripts]
+patrol-demo = "patrol_scheduler.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
