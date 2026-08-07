@@ -1,0 +1,15 @@
+[project]
+name = "patrol-scheduler"
+version = "0.1.0"
+requires-python = ">=3.11"
+dependencies = ["ortools>=9.10,<10"]
+[project.scripts]
+patrol-scheduler-demo = "patrol_scheduler.cli:main"
+[tool.pytest.ini_options]
+testpaths = ["backend/tests"]
+
+[tool.setuptools]
+package-dir = {"" = "backend"}
+
+[tool.setuptools.packages.find]
+where = ["backend"]
